@@ -1,0 +1,30 @@
+{
+  "name": "pvot",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PVOT — Executive Calendar Aggregation Platform",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev":       "turbo run dev",
+    "dev:web":   "turbo run dev --filter=@pvot/web",
+    "dev:mobile":"turbo run dev --filter=@pvot/mobile",
+    "build":     "turbo run build",
+    "lint":      "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test":      "turbo run test",
+    "clean":     "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo":       "^2.0.0",
+    "typescript":  "^5.4.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

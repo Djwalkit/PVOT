@@ -1,0 +1,196 @@
+/**
+ * apps/web/src/app/globals.css
+ * PVOT — Base CSS Layer
+ *
+ * Imports design system fonts, sets base HTML/body defaults.
+ * All color values reference CSS custom properties derived from
+ * the Tailwind config — this file is the bridge between
+ * Tailwind's JIT output and any runtime CSS variable usage.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── BASE ─────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family:             'IBM Plex Sans', system-ui, sans-serif;
+    font-size:               14px;
+    line-height:             1.5;
+    -webkit-font-smoothing:  antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering:          optimizeLegibility;
+    scroll-behavior:         smooth;
+  }
+
+  body {
+    background-color: #080C14; /* canvas */
+    color:            #E8EFF8; /* primary text */
+    min-height:       100dvh;
+    overflow-x:       hidden;
+  }
+
+  /* ── Focus styles (keyboard navigation) ── */
+  :focus-visible {
+    outline:        2px solid #1A6EFA;
+    outline-offset: 3px;
+    border-radius:  inherit;
+  }
+
+  /* Remove default focus ring for mouse users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* ── Selection ── */
+  ::selection {
+    background-color: rgba(26, 110, 250, 0.3);
+    color:            #E8EFF8;
+  }
+
+  /* ── Scrollbar (webkit) ── */
+  ::-webkit-scrollbar {
+    width:  6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background:    transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background:    #243452;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background:    #2D3E57;
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration:        0.01ms !important;
+      animation-iteration-count: 1      !important;
+      transition-duration:       0.01ms !important;
+    }
+  }
+}
+
+/* ─── COMPONENTS ───────────────────────────────────────────────────────────── */
+
+@layer components {
+  /* Skip navigation link (a11y) */
+  .skip-nav {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[70];
+    @apply bg-blue-500 text-white px-4 py-2 rounded-md text-ui-md font-body;
+  }
+
+  /* Skeleton shimmer base */
+  .skeleton {
+    @apply bg-rim rounded-sm animate-skeleton;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.8s ease infinite;
+  }
+
+  @keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}
+
+/* ─── UTILITIES ────────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  /* Account color system — applied via data-color-index attribute */
+  [data-color-index="0"] { --account-color: #3D87FF; }
+  [data-color-index="1"] { --account-color: #10B981; }
+  [data-color-index="2"] { --account-color: #F59E0B; }
+  [data-color-index="3"] { --account-color: #E879F9; }
+  [data-color-index="4"] { --account-color: #38BDF8; }
+  [data-color-index="5"] { --account-color: #FB923C; }
+  [data-color-index="6"] { --account-color: #A78BFA; }
+
+  .account-accent-border {
+    border-left: 3px solid var(--account-color, #3D87FF);
+  }
+  .account-accent-bg {
+    background-color: color-mix(in srgb, var(--account-color, #3D87FF) 8%, transparent);
+  }
+  .account-accent-dot {
+    background-color: var(--account-color, #3D87FF);
+  }
+
+  /* Privacy blur — applied when privacyMode is active */
+  .privacy-blur {
+    filter:         blur(6px);
+    user-select:    none;
+    pointer-events: none;
+    transition:     filter 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .privacy-blur-reveal {
+    filter:     none;
+    transition: filter 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ─── GLASSMORPHISM UTILITIES ─────────────────────────────────────────────── */
+
+.glass-card {
+  background:    rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel {
+  background:    rgba(10, 14, 24, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.glass-bar {
+  background:    rgba(8, 12, 20, 0.90);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ─── ANIMATIONS ──────────────────────────────────────────────────────────── */
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-slide-up  { animation: slide-up  0.2s ease-out forwards; }
+.animate-shake     { animation: shake     0.4s ease-in-out; }
+.animate-fade-in   { animation: fade-in   0.15s ease-out forwards; }

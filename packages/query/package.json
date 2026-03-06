@@ -1,0 +1,28 @@
+{
+  "name": "@pvot/query",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PVOT React Query configuration, query key factory, and data hooks",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint":      "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@pvot/core":                           "workspace:*",
+    "@tanstack/react-query":                "^5.40.0",
+    "@tanstack/react-query-persist-client": "^5.40.0",
+    "@tanstack/query-sync-storage-persister":"^5.40.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "typescript":   "^5.4.0"
+  }
+}

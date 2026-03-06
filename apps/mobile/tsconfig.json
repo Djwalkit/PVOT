@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "paths": {
+      "@pvot/core/*":  ["../../packages/core/src/*"],
+      "@pvot/ui/*":    ["../../packages/ui/src/*"],
+      "@pvot/query/*": ["../../packages/query/src/*"]
+    }
+  },
+  "include": ["src/**/*", "app.json"],
+  "exclude": ["node_modules"]
+}

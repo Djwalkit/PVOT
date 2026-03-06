@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@pvot/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@pvot/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@pvot/query/*": [
+        "../../packages/query/src/*"
+      ]
+    },
+    "allowJs": true,
+    "incremental": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+, ".next/types/app/root-layout.tsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
