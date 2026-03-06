@@ -26,7 +26,7 @@ import { useRouter }                    from 'next/navigation';
 import { getOAuthClient, OAuthError }   from '@pvot/core/auth/OAuthClient';
 import { getTokenStore }                from '@pvot/core/auth/TokenStore';
 import { useAuthStore }                 from '@pvot/core/stores';
-import type { ConnectedAccount }        from '@pvot/core/types';
+import type { ConnectedAccount }        from '@pvot/core/stores';
 
 type CallbackState =
   | { status: 'processing' }

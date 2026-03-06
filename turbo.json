@@ -1,6 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+    "NEXT_PUBLIC_APP_URL",
+    "GOOGLE_CLIENT_SECRET",
+    "NODE_ENV"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -11,14 +16,10 @@
       "persistent": true
     },
     "lint": {
-      "outputs": []
+      "dependsOn": ["^lint"]
     },
-    "typecheck": {
-      "dependsOn": ["^build"],
-      "outputs": []
-    },
-    "test": {
-      "outputs": []
+    "type-check": {
+      "dependsOn": ["^type-check"]
     },
     "clean": {
       "cache": false
