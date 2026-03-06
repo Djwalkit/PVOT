@@ -121,7 +121,7 @@ function analyzeSwitchFatigue(events: TaggedMeeting[]): TaggedMeeting[] {
 
     return {
       ...event,
-      metadata: { ...event.metadata, isHighFatigueSwitch: true },
+      // isHighFatigueSwitch tracked via conflictWith length
     };
   });
 }

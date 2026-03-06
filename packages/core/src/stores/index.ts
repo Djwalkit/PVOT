@@ -27,9 +27,9 @@ export interface ConnectedAccount {
   displayName:   string;
   photoUrl:      string | null;
   provider?:     'google' | 'microsoft';
-  colorIndex:    number;          // assigned by addAccount for lane colour
+  colorIndex:    0 | 1 | 2 | 3 | 4 | 5 | 6;  // assigned by addAccount for lane colour
   status:        'active' | 'error' | 'refreshing';
-  errorCode:     string | null;
+  errorCode:     'token_expired' | 'fetch_failed' | 'scope_changed' | 'rate_limited' | null;
   errorMessage:  string | null;
   lastSyncedAt:  string | null;   // ISO string
   addedAt:       string;          // ISO string

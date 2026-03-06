@@ -17,38 +17,10 @@
 import { getTokenStore }  from '../auth/TokenStore';
 import type { OAuthTokens } from '../auth/OAuthClient';
 import type { ConnectedAccount } from '../stores/index';
+import type { Meeting, Attendee } from '../types/index';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
-export interface Meeting {
-  id:          string;
-  title:       string;
-  startUtc:    string;   // ISO 8601
-  endUtc:      string;   // ISO 8601
-  isAllDay:    boolean;
-  attendees:   Attendee[];
-  location:    string | null;
-  description: string | null;
-  htmlLink:    string | null;
-  colorId:     string | null;
-  status:      'confirmed' | 'tentative' | 'cancelled';
-  organizer:   string | null;
-  accountId:   string;
-  metadata:    MeetingMetadata;
-}
-
-export interface Attendee {
-  email:       string;
-  displayName: string | null;
-  self:        boolean;
-  status:      'accepted' | 'declined' | 'tentative' | 'needsAction';
-}
-
-export interface MeetingMetadata {
-  isHighFatigueSwitch?: boolean;
-  hasConflict?:         boolean;
-  conflictIds?:         string[];
-}
 
 // ─── CLIENT ───────────────────────────────────────────────────────────────────
 
@@ -264,31 +236,64 @@ export class CalendarClient {
         const startUtc   = e.start.dateTime ?? `${e.start.date}T00:00:00Z`;
         const endUtc     = e.end.dateTime   ?? `${e.end.date}T23:59:59Z`;
 
-        // Extract video join URL: prefer Google Meet conferenceData, fall back to hangoutLink
+        // Extract video join URL as VideoLink object
         const videoEntry = e.conferenceData?.entryPoints?.find(ep => ep.entryPointType === 'video');
-        const videoLink  = videoEntry?.uri ?? e.hangoutLink ?? null;
+        const rawUrl     = videoEntry?.uri ?? e.hangoutLink ?? null;
+        const videoLink  = rawUrl ? {
+          provider: rawUrl.includes('meet.google') ? 'google_meet' as const
+                  : rawUrl.includes('zoom.us')     ? 'zoom'         as const
+                  : rawUrl.includes('teams')        ? 'teams'        as const
+                  : rawUrl.includes('webex')        ? 'webex'        as const
+                  : 'unknown'                                        as const,
+          url:   rawUrl,
+          label: rawUrl.includes('meet.google') ? 'Join Google Meet'
+               : rawUrl.includes('zoom.us')     ? 'Join Zoom'
+               : rawUrl.includes('teams')        ? 'Join Teams'
+               : rawUrl.includes('webex')        ? 'Join Webex'
+               : 'Join Call',
+        } : null;
+
+        const selfAttendee = (e.attendees ?? []).find(a => a.self);
 
         return {
-          id:          e.id,
-          title:       e.summary ?? '(No title)',
+          id:               e.id,
+          googleEventId:    e.id,
+          accountId,
           startUtc,
           endUtc,
           isAllDay,
-          location:    e.location    ?? null,
-          description: e.description ?? null,
-          htmlLink:    e.htmlLink     ?? null,
-          colorId:     e.colorId     ?? null,
-          status:      (e.status as Meeting['status']) ?? 'confirmed',
-          organizer:   e.organizer?.email ?? null,
-          accountId,
+          timezone:         e.start.timeZone ?? timezone,
+          title:            e.summary ?? '(No title)',
+          description:      e.description ?? null,
+          location:         e.location    ?? null,
+          htmlLink:         e.htmlLink    ?? '',
+          status:           (e.status as Meeting['status']) ?? 'confirmed',
           videoLink,
+          allVideoLinks:    videoLink ? [videoLink] : [],
+          organizer: e.organizer ? {
+            email:          e.organizer.email ?? '',
+            displayName:    e.organizer.displayName ?? null,
+            responseStatus: 'accepted' as const,
+            self:           false,
+            organizer:      true,
+          } : null,
           attendees: (e.attendees ?? []).map(a => ({
-            email:       a.email ?? '',
-            displayName: a.displayName ?? null,
-            self:        a.self ?? false,
-            status:      (a.responseStatus as Attendee['status']) ?? 'needsAction',
+            email:          a.email ?? '',
+            displayName:    a.displayName ?? null,
+            responseStatus: (a.responseStatus as Attendee['responseStatus']) ?? 'needsAction',
+            self:           a.self ?? false,
+            organizer:      a.organizer ?? false,
           })),
-          metadata: {},
+          selfRsvp:         (selfAttendee?.responseStatus as Meeting['selfRsvp']) ?? null,
+          isConflict:       false,
+          conflictWith:     [],
+          hasNoBuffer:      false,
+          isBackToBack:     false,
+          bufferGapMins:    null,
+          colorIndex:       0 as const,
+          calendarName:     '',
+          recurringEventId: e.recurringEventId ?? null,
+          workspaceId:      null,
         };
       });
   }
@@ -317,9 +322,10 @@ interface GoogleCalendarEvent {
   status?:      string;
   start:        { dateTime?: string; date?: string; timeZone?: string };
   end:          { dateTime?: string; date?: string; timeZone?: string };
-  organizer?:   { email?: string; displayName?: string };
-  attendees?:   GoogleAttendee[];
-  hangoutLink?: string;
+  organizer?:        { email?: string; displayName?: string };
+  attendees?:        GoogleAttendee[];
+  hangoutLink?:      string;
+  recurringEventId?: string;
   conferenceData?: { entryPoints?: ConferenceEntryPoint[] };
 }
 
@@ -327,6 +333,7 @@ interface GoogleAttendee {
   email?:          string;
   displayName?:    string;
   self?:           boolean;
+  organizer?:      boolean;
   responseStatus?: string;
 }
 
